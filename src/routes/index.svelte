@@ -2,6 +2,9 @@
     import { onMount } from "svelte";
     import config from "../config.js";
 
+    const animation_time = 1000;
+    const animation_tick = 10;
+    const animation_mod = animation_tick / animation_time;
     let completed = 0;
     let pending = 0;
     let failed = 0;
@@ -17,11 +20,15 @@
 
     onMount(async () => {
         const gatekeeper_data = await fetch_gatekeeper_data();
-        console.log(gatekeeper_data)
+        const rates = {
+            completed: gatekeeper_data.completed * animation_mod,
+            pending: gatekeeper_data.pending * animation_mod,
+            failed: gatekeeper_data.failed * animation_mod,
+        }
         const incrementer = setInterval(() => {
-            failed ++;
-            pending ++;
-            completed ++;
+            failed += rates.failed;
+            pending += rates.pending;
+            completed += rates.completed;
             failed = Math.min(failed, gatekeeper_data.failed);
             pending = Math.min(pending, gatekeeper_data.pending);
             completed = Math.min(completed, gatekeeper_data.completed);
@@ -32,7 +39,7 @@
             ) {
                 clearInterval(incrementer);
             }
-        }, 10)
+        }, animation_tick)
     })    
 </script>
 
@@ -41,15 +48,15 @@
     <div class="stats">
         <div class="stat">
             <h4 class="green">Completed captchas</h4>
-            <h2>{completed}</h2>
+            <h2>{Math.floor(completed)}</h2>
         </div>
         <div class="stat">
             <h4 class="yellow">Pending captchas</h4>
-            <h2>{pending}</h2>
+            <h2>{Math.floor(pending)}</h2>
         </div>
         <div class="stat">
             <h4 class="red">Failed captchas</h4>
-            <h2>{failed}</h2>
+            <h2>{Math.floor(failed)}</h2>
         </div>
     </div>
 </div>
