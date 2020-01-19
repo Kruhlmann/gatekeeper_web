@@ -8,7 +8,7 @@ export async function get(req, res, next) {
         pool = new Pool(config.db);
     }
     const response = await pool.query(
-        "SELECT * FROM quizs WHERE active=true OR completed=5 OR wrong=3;"
+        "SELECT * FROM quizs WHERE active=true OR completed=3 OR wrong=5;"
     );
     const quizs = response.rows;
     res.end(
